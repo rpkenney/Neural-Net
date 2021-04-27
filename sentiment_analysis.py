@@ -95,7 +95,6 @@ class NeuralNetwork:
         
 stop_words = stopwords.words('english')
 
-#from online resource
 def lemmatize_sentence(tokens):
     lemmatizer = WordNetLemmatizer()
     lemmatized_sentence = []
@@ -109,7 +108,6 @@ def lemmatize_sentence(tokens):
         lemmatized_sentence.append(lemmatizer.lemmatize(word, pos))
     return lemmatized_sentence
 
-#from online resource
 def remove_noise(tweet_tokens, stop_words = ()):
 
     cleaned_tokens = []
@@ -133,13 +131,13 @@ def remove_noise(tweet_tokens, stop_words = ()):
             cleaned_tokens.append(token.lower())
     return cleaned_tokens
 
-#from online resource
+
 def get_all_words(cleaned_tokens_list):
     for tokens in cleaned_tokens_list:
         for token in tokens:
             yield token
 
-#mine
+
 def get_most_common_words(cleaned_tokens_list, count):
     freq_dist_pos = FreqDist(get_all_words(cleaned_tokens_list))
     cleaned_tokens_list = freq_dist_pos.most_common(count)
@@ -151,7 +149,6 @@ def get_most_common_words(cleaned_tokens_list, count):
                 words.append(token)
     return words
 
-#from online resource
 positive_tweets = twitter_samples.strings('positive_tweets.json')
 negative_tweets = twitter_samples.strings('negative_tweets.json')
 text = twitter_samples.strings('tweets.20150430-223406.json')
@@ -181,7 +178,6 @@ random.shuffle(dataset)
 train_data = dataset[:7000]
 test_data = dataset[7000:]
 
-#mine
 
 vocabulary = get_most_common_words(positive_cleaned_tokens_list, 30) + get_most_common_words(negative_cleaned_tokens_list, 30)
 
@@ -200,6 +196,7 @@ for tweet in train_data:
             inputs.append(0)
     nn.backpropagation(inputs, tweet[1])
 
+"""
 for tweet in test_data:
     inputs = []
     for i in range(len(vocabulary)):
@@ -207,26 +204,8 @@ for tweet in test_data:
             inputs.append(1)
         else:
             inputs.append(0)
-    print(nn.run(inputs), "should be:", tweet[1])
 
-
-for line in fileinput.input("C:/Users/kenn5/Desktop/sentences.txt"):
-    print(line)
-    inputs = line.split(" ")
-    inputs = remove_noise(inputs, stop_words)
-    nninput = []
-    num = 0
-    for i in range(len(vocabulary)):
-        if vocabulary[i] in inputs:
-            nninput.append(1)
-            print(vocabulary[i])
-            num += 1
-        else:
-            nninput.append(0)
-    print(num, "words are in the vocab of the nn")
-    print(nn.run(nninput))
-    input("Press enter to continue....")
-
+"""
 
 while True:
     print("Enter a sentence:")
