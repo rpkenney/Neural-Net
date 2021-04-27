@@ -5,6 +5,7 @@ from nltk import FreqDist
 from nltk.stem.wordnet import WordNetLemmatizer
 import re, string, random
 import numpy as np
+import fileinput
 
 class Perceptron:
 
@@ -64,7 +65,7 @@ class NeuralNetwork:
 
     def backpropagation(self, input, expected):
         input = np.array(input)
-        expected = np.array(input)
+        expected = np.array(expected)
 
         output = self.run(input)
 
@@ -167,10 +168,10 @@ for tokens in negative_tweet_tokens:
     negative_cleaned_tokens_list.append(remove_noise(tokens, stop_words))
 
 
-positive_dataset = [(tweet, 1)
+positive_dataset = [(tweet, [1, 1, 1, 1, 1])
                      for tweet in positive_cleaned_tokens_list]
 
-negative_dataset = [(tweet, 0)
+negative_dataset = [(tweet, [0, 0, 0, 0, 0])
                      for tweet in negative_cleaned_tokens_list]
 
 dataset = positive_dataset + negative_dataset
@@ -182,21 +183,50 @@ test_data = dataset[7000:]
 
 #mine
 
-vocabulary = get_most_common_words(positive_cleaned_tokens_list, 50) + get_most_common_words(negative_cleaned_tokens_list, 50)
+vocabulary = get_most_common_words(positive_cleaned_tokens_list, 30) + get_most_common_words(negative_cleaned_tokens_list, 30)
 
 
-nn = NeuralNetwork([100, 50, 25, 10, 1])
+nn = NeuralNetwork([len(vocabulary), 30, 15, 5])
 
-print(vocabulary)
-
+num = 0
 for tweet in train_data:
+    num += 1
+    print(num)
     inputs = []
     for i in range(len(vocabulary)):
         if vocabulary[i] in tweet[0]:
             inputs.append(1)
         else:
             inputs.append(0)
-    nn.backpropagation(inputs, [tweet[1]])
+    nn.backpropagation(inputs, tweet[1])
+
+for tweet in test_data:
+    inputs = []
+    for i in range(len(vocabulary)):
+        if vocabulary[i] in tweet[0]:
+            inputs.append(1)
+        else:
+            inputs.append(0)
+    print(nn.run(inputs), "should be:", tweet[1])
+
+
+for line in fileinput.input("C:/Users/kenn5/Desktop/sentences.txt"):
+    print(line)
+    inputs = line.split(" ")
+    inputs = remove_noise(inputs, stop_words)
+    nninput = []
+    num = 0
+    for i in range(len(vocabulary)):
+        if vocabulary[i] in inputs:
+            nninput.append(1)
+            print(vocabulary[i])
+            num += 1
+        else:
+            nninput.append(0)
+    print(num, "words are in the vocab of the nn")
+    print(nn.run(nninput))
+    input("Press enter to continue....")
+
 
 while True:
     print("Enter a sentence:")
@@ -208,5 +238,4 @@ while True:
             nninput.append(1)
         else:
             nninput.append(0)
-    print(nninput)
-    print(nn.run(nninput)[0])
+    print(nn.run(nninput))
